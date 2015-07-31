@@ -1,0 +1,4 @@
+SELECT
+  "task".*
+FROM
+  task

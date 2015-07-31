@@ -1,0 +1,24 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity SourceRepository derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#SourceRepository
+
+	attributes {
+		primarykey sid 		=> sr_id generatedby { "Postgres" autokey }
+		, repository 		=> resolve TaskRepository.selectById(sr_fk_repository)
+		, sourceUrl 		=> sr_source_url
+		, type 				=> sr_type
+		, webUrl 			=> sr_weburl
+	}
+	queries {
+		selectAll() {
+			default SourceRepository FROM "source_repository"
+		},
+		single selectById(primarykey long sid) {
+			default SourceRepository FROM "source_repository" WHERE "sr_id = ${sid}"
+		},
+		selectAllForRepository(long rId) {
+			default SourceRepository FROM "source_repository" WHERE "sr_fk_repository = ${rId}"
+		}
+	}
+} as source_repository

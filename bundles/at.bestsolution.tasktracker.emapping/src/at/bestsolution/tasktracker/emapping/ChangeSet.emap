@@ -1,0 +1,31 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity ChangeSet derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#ChangeSet
+
+	attributes {
+		  primarykey sid 		=> cs_id generatedby { "Postgres" autokey }
+		, comment 				=> cs_comment
+		, id 					=> cs_vcs_id
+		, person 				=> resolve Person.selectById(cs_fk_person)
+		, sourceRepository 		=> resolve SourceRepository.selectById(cs_fk_repository)
+		, task 					=> resolve Task.selectById(cs_fk_task)
+	}
+	queries {
+		selectAll() {
+			default ChangeSet FROM "change_set"
+		},
+		single selectById(primarykey long sid) {
+			default ChangeSet FROM "change_set" WHERE "cs_id = ${sid}"
+		},
+		selectAllForPerson(long pId) {
+			default ChangeSet FROM "change_set" WHERE "cs_fk_person = ${pId}"
+		},
+		selectAllForSourceRepository(long srId) {
+			default ChangeSet FROM "change_set" WHERE "cs_fk_repository = ${srId}"
+		},
+		selectAllForTask(long tId) {
+			default ChangeSet FROM "change_set" WHERE "cs_fk_task = ${tId}"
+		}
+	}
+} as change_set

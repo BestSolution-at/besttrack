@@ -1,0 +1,1 @@
+tr_fk_parent IS NULL

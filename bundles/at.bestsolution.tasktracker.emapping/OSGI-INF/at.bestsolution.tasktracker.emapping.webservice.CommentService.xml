@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.2.0" name="at.bestsolution.tasktracker.emapping.webservice.CommentService">
+   <implementation class="at.bestsolution.tasktracker.emapping.webservice.CommentService"/>
+   <service>
+      <provide interface="at.bestsolution.tasktracker.emapping.webservice.CommentService"/>
+   </service>
+   <reference bind="setSessionFactory" cardinality="1..1" interface="at.bestsolution.persistence.SessionFactory" name="SessionFactory" policy="static" policy-option="greedy" unbind="unsetSessionFactory"/>
+</scr:component>

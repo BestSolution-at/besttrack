@@ -1,0 +1,27 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity RepositoryPerson derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#RepositoryPerson
+
+	attributes {
+		  primarykey sid 		=> rp_id generatedby { "Postgres" autokey }
+		, person 				=> resolve Person.selectById(rp_fk_person)
+		, privilegeMask 		=> rp_privilege_mask
+		, repository 			=> resolve TaskRepository.selectById(rp_fk_repository)
+	}
+
+	queries {
+		selectAll() {
+			default RepositoryPerson FROM "repository_person"
+		},
+		single selectById(primarykey long sid) {
+			default RepositoryPerson FROM "repository_person" WHERE "rp_id = ${sid}"
+		},
+		selectAllForPerson(long pId) {
+			default RepositoryPerson FROM "repository_person" WHERE "rp_fk_person = ${pId}"
+		},
+		selectAllForRepository(long rId) {
+			default RepositoryPerson FROM "repository_person" WHERE "rp_fk_repository = ${rId}"
+		}
+	}
+} as repository_person

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="at.bestsolution.tasktracker.server.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.equinox.http.registry.resources">
+      <resource
+            alias="/static"
+            base-name="/static">
+      </resource>
+      <resource
+            alias="/"
+            base-name="/static">
+      </resource>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="at.bestsolution.tasktracker.server.application"
+            name="tasktracker">
+         <property
+               name="appName"
+               value="tasktracker">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

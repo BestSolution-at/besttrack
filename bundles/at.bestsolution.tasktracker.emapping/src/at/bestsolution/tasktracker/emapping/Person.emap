@@ -1,0 +1,20 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity Person derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#Person
+
+	attributes {
+		  primarykey sid 		=> p_id generatedby { "Postgres" autokey }
+		, firstname 			=> p_firstname
+		, lastname 				=> p_surname
+		, repositoryList 		=> resolve RepositoryPerson.selectAllForPerson(p_id)
+	}
+	queries {
+		selectAll() {
+			default Person FROM "person"
+		},
+		single selectById(primarykey long sid) {
+			default Person FROM "person" WHERE "p_id = ${sid}"
+		}
+	}
+} as person

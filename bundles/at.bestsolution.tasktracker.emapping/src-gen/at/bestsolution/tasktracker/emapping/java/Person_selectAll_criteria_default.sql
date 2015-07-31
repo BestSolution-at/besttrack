@@ -1,0 +1,4 @@
+SELECT
+  "person".*
+FROM
+  person

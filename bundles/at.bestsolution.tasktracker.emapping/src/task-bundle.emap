@@ -1,0 +1,42 @@
+bundle Tasktracker {
+	BaseObject,
+
+	ChangeSet {
+		webservice rest
+	},
+	Comment {
+		webservice {
+			Comment.selectAllForTask as "commentsPerTask" {
+				query-param Comment.selectAllForTask.tid
+			}
+		} rest
+	},
+	CommentAttachment{
+		webservice rest
+	},
+	Person{
+		webservice rest
+	},
+	RepositoryPerson{
+		webservice rest
+	},
+	SourceRepository{
+		webservice rest
+	},
+	Task{
+		webservice {
+			Task.selectOpenTasksForRepository as "open-tasks-in-repo" {
+				query-param Task.selectOpenTasksForRepository.rId
+			}
+		} rest
+	},
+	TaskAttachment{
+		webservice rest
+	},
+	TaskRepository{
+		webservice rest
+	},
+	Version{
+		webservice rest
+	}
+} databases "Postgres"

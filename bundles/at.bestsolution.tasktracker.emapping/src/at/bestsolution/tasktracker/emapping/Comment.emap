@@ -1,0 +1,24 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity Comment derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#Comment
+	attributes {
+		primarykey sid 		=> co_id generatedby { "Postgres" autokey }
+		, attachmentList 	=> resolve CommentAttachment.selectAllForComment(co_id)
+		, description 		=> co_description
+		, task 				=> resolve Task.selectById(co_fk_task)
+		, title 			=> co_title
+	}
+
+	queries {
+		selectAll() {
+			default Comment FROM "comment"
+		},
+		single selectById(primarykey long sid) {
+			default Comment FROM "comment" WHERE "co_id = ${sid}"
+		},
+		selectAllForTask(long tid) {
+			default Comment FROM "comment" WHERE "co_fk_task = ${tid}"
+		}
+	}
+} as comment

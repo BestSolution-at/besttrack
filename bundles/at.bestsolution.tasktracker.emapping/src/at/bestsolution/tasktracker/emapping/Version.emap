@@ -1,0 +1,24 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity Version derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#Version
+
+	attributes {
+		primarykey sid 		=> v_id generatedby { "Postgres" autokey }
+		, codename 			=> v_name
+		, date 				=> v_date
+		, repository 		=> resolve TaskRepository.selectById(v_fk_repository)
+		, value 			=> v_value
+	}
+	queries {
+		selectAll() {
+			default Version FROM "version"
+		},
+		single selectById(primarykey long sid) {
+			default Version FROM "version" WHERE "v_id = ${sid}"
+		},
+		selectAllForRepository(long rId) {
+			default Version FROM "version" WHERE "v_fk_repository = ${rId}"
+		}
+	}
+} as version

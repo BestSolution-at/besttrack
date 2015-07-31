@@ -1,0 +1,26 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity TaskAttachment derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#TaskAttachment
+
+	attributes {
+		primarykey sid 		=> ta_id generatedby { "Postgres" autokey },
+		binary 				=> ta_binary,
+		description 		=> ta_description,
+		mimetype 			=> ta_mimetype,
+		task 				=> resolve Task.selectById(ta_fk_task),
+		title 				=> ta_title
+	}
+
+	queries {
+		selectAll() {
+			default TaskAttachment FROM "task_attachment"
+		},
+		single selectById(primarykey long sid) {
+			default TaskAttachment FROM "task_attachment" WHERE "ta_id = ${sid}"
+		},
+		selectAllForTask(long tId) {
+			default TaskAttachment FROM "task_attachment" WHERE "ta_fk_task = ${tId}"
+		}
+	}
+} as task_attachment

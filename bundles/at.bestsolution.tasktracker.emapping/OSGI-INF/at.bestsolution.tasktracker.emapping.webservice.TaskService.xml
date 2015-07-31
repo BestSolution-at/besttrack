@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.2.0" name="at.bestsolution.tasktracker.emapping.webservice.TaskService">
+   <implementation class="at.bestsolution.tasktracker.emapping.webservice.TaskService"/>
+   <service>
+      <provide interface="at.bestsolution.tasktracker.emapping.webservice.TaskService"/>
+   </service>
+   <reference bind="setSessionFactory" cardinality="1..1" interface="at.bestsolution.persistence.SessionFactory" name="SessionFactory" policy="static" policy-option="greedy" unbind="unsetSessionFactory"/>
+</scr:component>

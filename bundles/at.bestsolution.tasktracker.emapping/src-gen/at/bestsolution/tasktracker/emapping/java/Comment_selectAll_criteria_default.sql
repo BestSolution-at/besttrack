@@ -1,0 +1,4 @@
+SELECT
+  "comment".*
+FROM
+  comment

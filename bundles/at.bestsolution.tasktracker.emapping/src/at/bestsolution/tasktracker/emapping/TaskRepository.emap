@@ -1,0 +1,32 @@
+package at.bestsolution.tasktracker.emapping;
+
+entity TaskRepository derived BaseObject {
+	etype "http://www.bestsolution.at/emap/tasktracker/1.0"#TaskRepository
+
+	attributes {
+		 primarykey sid 		=> tr_id generatedby { "Postgres" autokey }
+		, description 			=> tr_description
+		, name 					=> tr_name
+		, personList 			=> resolve RepositoryPerson.selectAllForRepository(tr_id)
+		, sourceRepositoryList 	=> resolve SourceRepository.selectAllForRepository(tr_id)
+		, versionList 			=> resolve Version.selectAllForRepository(tr_id)
+		, children 				=> resolve TaskRepository.selectAllForParent(tr_id)
+		, parent 				=> resolve TaskRepository.selectById(tr_fk_parent)
+		, externalId 			=> tr_external_id
+		, publicRepo 			=> tr_public
+	}
+	queries {
+		selectAll() {
+			default TaskRepository FROM "task_repository"
+		},
+		single selectById(primarykey long sid) {
+			default TaskRepository FROM "task_repository" WHERE "tr_id = ${sid}"
+		},
+		selectAllForParent(long parentSid) {
+			default TaskRepository FROM "task_repository" WHERE "tr_fk_parent = ${parentSid}"
+		},
+		selectTopLevel() {
+			default TaskRepository FROM "task_repository" WHERE "tr_fk_parent IS NULL"
+		}
+	}
+} as task_repository
