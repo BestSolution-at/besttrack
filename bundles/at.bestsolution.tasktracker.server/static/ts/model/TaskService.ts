@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="Task.ts"/>
-
-interface TaskValueCallback {
-	( entity : Task, err: any ) : void
-}
-
-interface TaskListCallback {
-	( entity : Task[], err: any ) : void
-}
-
-interface TaskCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOTask.ts"/>
 
 class TaskService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class TaskService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : TaskListCallback ) {
+	getAll( callback : Consumer<DTOTask[]> ) {
 		this.listRequest(this.urlPrefix + "/task", callback);
 	}
 
-	get( id : number, callback : TaskValueCallback ) {
+	get( id : number, callback : Consumer<DTOTask> ) {
 		this.valueRequest(this.urlPrefix + "/task/"+id, callback);
 	}
 
-	create( entity : Task, callback : TaskCreationCallback ) {
+	create( entity : DTOTask, callback : Consumer<DTOTask> ) {
 		$.ajax({
     		url: this.urlPrefix + "/task",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOTask;
+			if( data ) {
+				entity = new DTOTask(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : TaskListCallback ) {
+	update( entity : DTOTask, callback : Consumer<DTOTask> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/task/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOTask;
+			if( data ) {
+				entity = new DTOTask(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOTask[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class TaskService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : Task[] = data.map( function( o ) { return new Task(o); } );
+			var entityList : DTOTask[] = data.map( function( o ) { return new DTOTask(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : TaskValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOTask> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,15 +68,18 @@ class TaskService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : Task;
+			var entity : DTOTask;
 			if( data ) {
-				entity = new Task(data);
+				entity = new DTOTask(data);
 			}
 			callback(entity, null);
 		});
 	}
 
-	selectOpenTasksForRepository( rId : number, callback : TaskListCallback ) {
+	openTaskInRepository( rId : number, callback : Consumer<Task> ) {
 		this.listRequest( this.urlPrefix + "/task/open-tasks-in-repo?rId="+rId+"", callback  );
+	}
+	getCompleteTask( sid : number, callback : Consumer<Task> ) {
+		this.valueRequest( this.urlPrefix + "/task/complete-task?sid="+sid+"", callback  );
 	}
 }

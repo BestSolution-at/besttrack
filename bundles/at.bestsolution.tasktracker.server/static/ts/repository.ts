@@ -2,12 +2,12 @@
 /// <reference path="../typings/mdl/mdl.d.ts"/>
 /// <reference path="common.ts"/>
 
-/// <reference path="model/TaskRepository.ts"/>
+/// <reference path="model/DTOTaskRepository.ts"/>
 /// <reference path="model/TaskRepositoryService.ts"/>
-/// <reference path="model/Task.ts"/>
+/// <reference path="model/DTOTask.ts"/>
 /// <reference path="model/TaskService.ts"/>
 
-var repository : TaskRepository;
+var repository : DTOTaskRepository;
 
 function initRepositoryPage() {
 	var repoId = parseLocationSearch()["id"];
@@ -22,7 +22,7 @@ function initRepositoryPage() {
 	}
 }
 
-function handleRepositoryData(data : TaskRepository) {
+function handleRepositoryData(data : DTOTaskRepository) {
 	console.log("Repository data: ", data);
 	repository = data;
 	$( '#repo-name' ).each(function() {
@@ -30,10 +30,10 @@ function handleRepositoryData(data : TaskRepository) {
 	});
 	
 	var taskService = new TaskService(rootPath);
-	taskService.selectOpenTasksForRepository(data.sid, handleRepositoryTasks)
+	taskService.openTaskInRepository(data.sid, handleRepositoryTasks)
 }
 
-function handleRepositoryTasks(data : Task[]) {
+function handleRepositoryTasks(data : DTOTask[]) {
 	console.log("Tasks data: ", data)
 
 	var html = [];

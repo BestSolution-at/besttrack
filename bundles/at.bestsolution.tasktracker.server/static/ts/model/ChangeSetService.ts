@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="ChangeSet.ts"/>
-
-interface ChangeSetValueCallback {
-	( entity : ChangeSet, err: any ) : void
-}
-
-interface ChangeSetListCallback {
-	( entity : ChangeSet[], err: any ) : void
-}
-
-interface ChangeSetCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOChangeSet.ts"/>
 
 class ChangeSetService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class ChangeSetService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : ChangeSetListCallback ) {
+	getAll( callback : Consumer<DTOChangeSet[]> ) {
 		this.listRequest(this.urlPrefix + "/changeset", callback);
 	}
 
-	get( id : number, callback : ChangeSetValueCallback ) {
+	get( id : number, callback : Consumer<DTOChangeSet> ) {
 		this.valueRequest(this.urlPrefix + "/changeset/"+id, callback);
 	}
 
-	create( entity : ChangeSet, callback : ChangeSetCreationCallback ) {
+	create( entity : DTOChangeSet, callback : Consumer<DTOChangeSet> ) {
 		$.ajax({
     		url: this.urlPrefix + "/changeset",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOChangeSet;
+			if( data ) {
+				entity = new DTOChangeSet(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : ChangeSetListCallback ) {
+	update( entity : DTOChangeSet, callback : Consumer<DTOChangeSet> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/changeset/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOChangeSet;
+			if( data ) {
+				entity = new DTOChangeSet(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOChangeSet[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class ChangeSetService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : ChangeSet[] = data.map( function( o ) { return new ChangeSet(o); } );
+			var entityList : DTOChangeSet[] = data.map( function( o ) { return new DTOChangeSet(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : ChangeSetValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOChangeSet> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class ChangeSetService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : ChangeSet;
+			var entity : DTOChangeSet;
 			if( data ) {
-				entity = new ChangeSet(data);
+				entity = new DTOChangeSet(data);
 			}
 			callback(entity, null);
 		});

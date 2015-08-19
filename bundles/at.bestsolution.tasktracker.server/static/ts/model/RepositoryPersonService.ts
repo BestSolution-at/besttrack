@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="RepositoryPerson.ts"/>
-
-interface RepositoryPersonValueCallback {
-	( entity : RepositoryPerson, err: any ) : void
-}
-
-interface RepositoryPersonListCallback {
-	( entity : RepositoryPerson[], err: any ) : void
-}
-
-interface RepositoryPersonCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTORepositoryPerson.ts"/>
 
 class RepositoryPersonService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class RepositoryPersonService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : RepositoryPersonListCallback ) {
+	getAll( callback : Consumer<DTORepositoryPerson[]> ) {
 		this.listRequest(this.urlPrefix + "/repositoryperson", callback);
 	}
 
-	get( id : number, callback : RepositoryPersonValueCallback ) {
+	get( id : number, callback : Consumer<DTORepositoryPerson> ) {
 		this.valueRequest(this.urlPrefix + "/repositoryperson/"+id, callback);
 	}
 
-	create( entity : RepositoryPerson, callback : RepositoryPersonCreationCallback ) {
+	create( entity : DTORepositoryPerson, callback : Consumer<DTORepositoryPerson> ) {
 		$.ajax({
     		url: this.urlPrefix + "/repositoryperson",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTORepositoryPerson;
+			if( data ) {
+				entity = new DTORepositoryPerson(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : RepositoryPersonListCallback ) {
+	update( entity : DTORepositoryPerson, callback : Consumer<DTORepositoryPerson> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/repositoryperson/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTORepositoryPerson;
+			if( data ) {
+				entity = new DTORepositoryPerson(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTORepositoryPerson[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class RepositoryPersonService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : RepositoryPerson[] = data.map( function( o ) { return new RepositoryPerson(o); } );
+			var entityList : DTORepositoryPerson[] = data.map( function( o ) { return new DTORepositoryPerson(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : RepositoryPersonValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTORepositoryPerson> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class RepositoryPersonService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : RepositoryPerson;
+			var entity : DTORepositoryPerson;
 			if( data ) {
-				entity = new RepositoryPerson(data);
+				entity = new DTORepositoryPerson(data);
 			}
 			callback(entity, null);
 		});

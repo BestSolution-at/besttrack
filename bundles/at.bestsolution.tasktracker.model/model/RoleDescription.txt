@@ -1,0 +1,4 @@
+TaskRepository {
+	read : personList[@sid = $loggedInUser.sid]
+	read: children[personList[@sid = $loggedInUser.sid]]
+}

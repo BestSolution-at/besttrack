@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="Version.ts"/>
-
-interface VersionValueCallback {
-	( entity : Version, err: any ) : void
-}
-
-interface VersionListCallback {
-	( entity : Version[], err: any ) : void
-}
-
-interface VersionCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOVersion.ts"/>
 
 class VersionService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class VersionService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : VersionListCallback ) {
+	getAll( callback : Consumer<DTOVersion[]> ) {
 		this.listRequest(this.urlPrefix + "/version", callback);
 	}
 
-	get( id : number, callback : VersionValueCallback ) {
+	get( id : number, callback : Consumer<DTOVersion> ) {
 		this.valueRequest(this.urlPrefix + "/version/"+id, callback);
 	}
 
-	create( entity : Version, callback : VersionCreationCallback ) {
+	create( entity : DTOVersion, callback : Consumer<DTOVersion> ) {
 		$.ajax({
     		url: this.urlPrefix + "/version",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOVersion;
+			if( data ) {
+				entity = new DTOVersion(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : VersionListCallback ) {
+	update( entity : DTOVersion, callback : Consumer<DTOVersion> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/version/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOVersion;
+			if( data ) {
+				entity = new DTOVersion(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOVersion[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class VersionService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : Version[] = data.map( function( o ) { return new Version(o); } );
+			var entityList : DTOVersion[] = data.map( function( o ) { return new DTOVersion(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : VersionValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOVersion> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class VersionService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : Version;
+			var entity : DTOVersion;
 			if( data ) {
-				entity = new Version(data);
+				entity = new DTOVersion(data);
 			}
 			callback(entity, null);
 		});

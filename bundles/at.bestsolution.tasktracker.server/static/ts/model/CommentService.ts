@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="Comment.ts"/>
-
-interface CommentValueCallback {
-	( entity : Comment, err: any ) : void
-}
-
-interface CommentListCallback {
-	( entity : Comment[], err: any ) : void
-}
-
-interface CommentCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOComment.ts"/>
 
 class CommentService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class CommentService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : CommentListCallback ) {
+	getAll( callback : Consumer<DTOComment[]> ) {
 		this.listRequest(this.urlPrefix + "/comment", callback);
 	}
 
-	get( id : number, callback : CommentValueCallback ) {
+	get( id : number, callback : Consumer<DTOComment> ) {
 		this.valueRequest(this.urlPrefix + "/comment/"+id, callback);
 	}
 
-	create( entity : Comment, callback : CommentCreationCallback ) {
+	create( entity : DTOComment, callback : Consumer<DTOComment> ) {
 		$.ajax({
     		url: this.urlPrefix + "/comment",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOComment;
+			if( data ) {
+				entity = new DTOComment(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : CommentListCallback ) {
+	update( entity : DTOComment, callback : Consumer<DTOComment> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/comment/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOComment;
+			if( data ) {
+				entity = new DTOComment(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOComment[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class CommentService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : Comment[] = data.map( function( o ) { return new Comment(o); } );
+			var entityList : DTOComment[] = data.map( function( o ) { return new DTOComment(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : CommentValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOComment> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,15 +68,15 @@ class CommentService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : Comment;
+			var entity : DTOComment;
 			if( data ) {
-				entity = new Comment(data);
+				entity = new DTOComment(data);
 			}
 			callback(entity, null);
 		});
 	}
 
-	selectAllForTask( tid : number, callback : CommentListCallback ) {
-		this.listRequest( this.urlPrefix + "/comment/commentsPerTask?tid="+tid+"", callback  );
+	commentsPerTask( tid : number, callback : Consumer<Comment> ) {
+		this.listRequest( this.urlPrefix + "/comment/comments-per-task?tid="+tid+"", callback  );
 	}
 }

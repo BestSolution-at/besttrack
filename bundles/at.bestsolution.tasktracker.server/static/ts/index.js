@@ -1,17 +1,19 @@
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="common.ts"/>
-/// <reference path="model/TaskRepository.ts"/>
+/// <reference path="model/DTOTaskRepository.ts"/>
 /// <reference path="model/TaskRepositoryService.ts"/>
-/// <reference path="model/Task.ts"/>
+/// <reference path="model/DTOTask.ts"/>
 /// <reference path="model/TaskService.ts"/>
 function initIndexPage() {
     var s = new TaskRepositoryService(rootPath);
     s.getAll(repositoryDataCallback);
 }
 function repositoryDataCallback(data, err) {
+    console.log("Task-Repositories", data);
     var repoMap = {};
     var htmlNavigationList = [];
     var htmlOptionList = [];
+    htmlOptionList.push('<option value="" disabled selected>Project</option>');
     data.forEach(function (value) {
         // Clear the children we'll create a real tree below
         value.children = [];
@@ -58,8 +60,8 @@ function createTask() {
     var title = $("#bug-form-title").val();
     var description = $("#bug-form-description").val();
     console.log("Repo: " + repoId, "Title: " + title, "Description: " + description);
-    var task = new Task();
-    var repo = new TaskRepository();
+    var task = new DTOTask();
+    var repo = new DTOTaskRepository();
     repo.metaProxy = true;
     repo.sid = repoId;
     task.repository = repo;
@@ -67,7 +69,7 @@ function createTask() {
     task.description = description;
     console.log("Sending ", task);
     var taskService = new TaskService(rootPath);
-    taskService.create(task, function (id, err) {
+    taskService.create(task, function (task, err) {
         // Inform used about the new task	
     });
 }

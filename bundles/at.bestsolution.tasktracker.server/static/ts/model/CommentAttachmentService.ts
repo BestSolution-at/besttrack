@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="CommentAttachment.ts"/>
-
-interface CommentAttachmentValueCallback {
-	( entity : CommentAttachment, err: any ) : void
-}
-
-interface CommentAttachmentListCallback {
-	( entity : CommentAttachment[], err: any ) : void
-}
-
-interface CommentAttachmentCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOCommentAttachment.ts"/>
 
 class CommentAttachmentService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class CommentAttachmentService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : CommentAttachmentListCallback ) {
+	getAll( callback : Consumer<DTOCommentAttachment[]> ) {
 		this.listRequest(this.urlPrefix + "/commentattachment", callback);
 	}
 
-	get( id : number, callback : CommentAttachmentValueCallback ) {
+	get( id : number, callback : Consumer<DTOCommentAttachment> ) {
 		this.valueRequest(this.urlPrefix + "/commentattachment/"+id, callback);
 	}
 
-	create( entity : CommentAttachment, callback : CommentAttachmentCreationCallback ) {
+	create( entity : DTOCommentAttachment, callback : Consumer<DTOCommentAttachment> ) {
 		$.ajax({
     		url: this.urlPrefix + "/commentattachment",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOCommentAttachment;
+			if( data ) {
+				entity = new DTOCommentAttachment(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : CommentAttachmentListCallback ) {
+	update( entity : DTOCommentAttachment, callback : Consumer<DTOCommentAttachment> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/commentattachment/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOCommentAttachment;
+			if( data ) {
+				entity = new DTOCommentAttachment(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOCommentAttachment[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class CommentAttachmentService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : CommentAttachment[] = data.map( function( o ) { return new CommentAttachment(o); } );
+			var entityList : DTOCommentAttachment[] = data.map( function( o ) { return new DTOCommentAttachment(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : CommentAttachmentValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOCommentAttachment> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class CommentAttachmentService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : CommentAttachment;
+			var entity : DTOCommentAttachment;
 			if( data ) {
-				entity = new CommentAttachment(data);
+				entity = new DTOCommentAttachment(data);
 			}
 			callback(entity, null);
 		});

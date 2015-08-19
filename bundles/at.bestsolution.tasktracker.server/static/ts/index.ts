@@ -1,9 +1,9 @@
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 
 /// <reference path="common.ts"/>
-/// <reference path="model/TaskRepository.ts"/>
+/// <reference path="model/DTOTaskRepository.ts"/>
 /// <reference path="model/TaskRepositoryService.ts"/>
-/// <reference path="model/Task.ts"/>
+/// <reference path="model/DTOTask.ts"/>
 /// <reference path="model/TaskService.ts"/>
 
 function initIndexPage() {
@@ -11,10 +11,13 @@ function initIndexPage() {
 	s.getAll( repositoryDataCallback );
 }
 
-function repositoryDataCallback(data : TaskRepository[], err) {
-	var repoMap : { [ id : string ] : TaskRepository } = {};
+function repositoryDataCallback(data : DTOTaskRepository[], err) {
+	console.log("Task-Repositories", data);
+	
+	var repoMap : { [ id : string ] : DTOTaskRepository } = {};
 	var htmlNavigationList: string[] = [];
 	var htmlOptionList: string[] = [];
+	htmlOptionList.push('<option value="" disabled selected>Project</option>')
 	
 	data.forEach( function(value) {
 		// Clear the children we'll create a real tree below
@@ -51,7 +54,7 @@ function repositoryDataCallback(data : TaskRepository[], err) {
 	});
 }
 
-function buildOptionList(level:number, repository: TaskRepository, htmlOptionList: string[]) {
+function buildOptionList(level:number, repository: DTOTaskRepository, htmlOptionList: string[]) {
 	var spacer : string = "";
 	for (var index = 0; index < level; index++) {
 		spacer += "&nbsp;&nbsp;&nbsp;"
@@ -72,8 +75,8 @@ function createTask() {
 	
 	console.log("Repo: " + repoId, "Title: " + title, "Description: " + description );
 	
-	var task = new Task();
-	var repo = new TaskRepository();
+	var task = new DTOTask();
+	var repo = new DTOTaskRepository();
 	repo.metaProxy = true;
 	repo.sid = repoId;
 	
@@ -84,7 +87,7 @@ function createTask() {
 	console.log("Sending ", task); 
 	
 	var taskService = new TaskService(rootPath);
-	taskService.create(task, function(id : number, err : any) {
+	taskService.create(task, function(task : DTOTask, err : any) {
 		// Inform used about the new task	
 	});
 }

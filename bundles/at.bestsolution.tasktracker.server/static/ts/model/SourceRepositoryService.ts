@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="SourceRepository.ts"/>
-
-interface SourceRepositoryValueCallback {
-	( entity : SourceRepository, err: any ) : void
-}
-
-interface SourceRepositoryListCallback {
-	( entity : SourceRepository[], err: any ) : void
-}
-
-interface SourceRepositoryCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOSourceRepository.ts"/>
 
 class SourceRepositoryService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class SourceRepositoryService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : SourceRepositoryListCallback ) {
+	getAll( callback : Consumer<DTOSourceRepository[]> ) {
 		this.listRequest(this.urlPrefix + "/sourcerepository", callback);
 	}
 
-	get( id : number, callback : SourceRepositoryValueCallback ) {
+	get( id : number, callback : Consumer<DTOSourceRepository> ) {
 		this.valueRequest(this.urlPrefix + "/sourcerepository/"+id, callback);
 	}
 
-	create( entity : SourceRepository, callback : SourceRepositoryCreationCallback ) {
+	create( entity : DTOSourceRepository, callback : Consumer<DTOSourceRepository> ) {
 		$.ajax({
     		url: this.urlPrefix + "/sourcerepository",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOSourceRepository;
+			if( data ) {
+				entity = new DTOSourceRepository(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : SourceRepositoryListCallback ) {
+	update( entity : DTOSourceRepository, callback : Consumer<DTOSourceRepository> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/sourcerepository/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOSourceRepository;
+			if( data ) {
+				entity = new DTOSourceRepository(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOSourceRepository[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class SourceRepositoryService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : SourceRepository[] = data.map( function( o ) { return new SourceRepository(o); } );
+			var entityList : DTOSourceRepository[] = data.map( function( o ) { return new DTOSourceRepository(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : SourceRepositoryValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOSourceRepository> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class SourceRepositoryService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : SourceRepository;
+			var entity : DTOSourceRepository;
 			if( data ) {
-				entity = new SourceRepository(data);
+				entity = new DTOSourceRepository(data);
 			}
 			callback(entity, null);
 		});

@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="TaskRepository.ts"/>
-
-interface TaskRepositoryValueCallback {
-	( entity : TaskRepository, err: any ) : void
-}
-
-interface TaskRepositoryListCallback {
-	( entity : TaskRepository[], err: any ) : void
-}
-
-interface TaskRepositoryCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOTaskRepository.ts"/>
 
 class TaskRepositoryService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class TaskRepositoryService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : TaskRepositoryListCallback ) {
+	getAll( callback : Consumer<DTOTaskRepository[]> ) {
 		this.listRequest(this.urlPrefix + "/taskrepository", callback);
 	}
 
-	get( id : number, callback : TaskRepositoryValueCallback ) {
+	get( id : number, callback : Consumer<DTOTaskRepository> ) {
 		this.valueRequest(this.urlPrefix + "/taskrepository/"+id, callback);
 	}
 
-	create( entity : TaskRepository, callback : TaskRepositoryCreationCallback ) {
+	create( entity : DTOTaskRepository, callback : Consumer<DTOTaskRepository> ) {
 		$.ajax({
     		url: this.urlPrefix + "/taskrepository",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOTaskRepository;
+			if( data ) {
+				entity = new DTOTaskRepository(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : TaskRepositoryListCallback ) {
+	update( entity : DTOTaskRepository, callback : Consumer<DTOTaskRepository> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/taskrepository/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOTaskRepository;
+			if( data ) {
+				entity = new DTOTaskRepository(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOTaskRepository[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class TaskRepositoryService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : TaskRepository[] = data.map( function( o ) { return new TaskRepository(o); } );
+			var entityList : DTOTaskRepository[] = data.map( function( o ) { return new DTOTaskRepository(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : TaskRepositoryValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOTaskRepository> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class TaskRepositoryService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : TaskRepository;
+			var entity : DTOTaskRepository;
 			if( data ) {
-				entity = new TaskRepository(data);
+				entity = new DTOTaskRepository(data);
 			}
 			callback(entity, null);
 		});

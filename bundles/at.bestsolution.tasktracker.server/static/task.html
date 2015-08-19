@@ -140,6 +140,11 @@ select:focus {
 					<li class="mdl-menu__item">Legal information</li>
 				</ul>
 			</div>
+			<div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+      			<a href="#basic-task-data" class="mdl-layout__tab is-active">Main</a>
+      			<a href="#task-time-management" class="mdl-layout__tab">Timemanagement</a>
+      			<a href="#task-bounty" class="mdl-layout__tab">Bounty</a>
+    		</div>
 		</header>
 		<div
 			class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
@@ -164,9 +169,9 @@ select:focus {
 				</div>
 			</header>
 			<nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-				<a class="mdl-navigation__link" href="index.html"><i
+				<a class="mdl-navigation__link" href="index.html" id="nav-task-repository-link"><i
 					class="mdl-color-text--blue-grey-400 material-icons"
-					role="presentation">arrow_back</i>Bizerba</a>
+					role="presentation">arrow_back</i><span id="nav-task-repository-label"></span></a>
 				<div class="mdl-layout-spacer"></div>
 				<a class="mdl-navigation__link" href=""><i
 					class="mdl-color-text--blue-grey-400 material-icons"
@@ -174,6 +179,8 @@ select:focus {
 			</nav>
 		</div>
 		<main class="mdl-layout__content mdl-color--grey-100">
+			<section class="mdl-layout__tab-panel is-active" id="basic-task-data">
+				<div class="page-content">
 		<div style="padding: 10px;">
 			<div class="mdl-card mdl-shadow--2dp demo-card-wide">
 				<div class="mdl-card__title">
@@ -194,6 +201,13 @@ select:focus {
 							<label class="mdl-textfield__label" for="form-task-description">Description</label>
 						</div>
 						<div class="mdl-selectfield">
+							<label>State</label> <select
+								id="bug-form-task-state">
+								<option value="" disabled selected>State</option>
+							</select>
+						</div>
+						<br />
+						<div class="mdl-selectfield">
 							<label>Version</label> <select
 								id="bug-form-task-version">
 								<option value="" disabled selected>Version</option>
@@ -211,7 +225,9 @@ select:focus {
 				</div>
 				<div class="mdl-card__actions mdl-card--border">
 					<a
-						class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						id="submit-task-change"
+						class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+						onclick="updateTask()">
 						Save </a>
 				</div>
 			</div>
@@ -221,35 +237,66 @@ select:focus {
 				<div class="mdl-tabs__tab-bar">
 					<a href="#comments-panel" class="mdl-tabs__tab is-active">Comments</a>
 					<a href="#source-changes-panel" class="mdl-tabs__tab">Source
-						changes</a> <a href="#time-panel" class="mdl-tabs__tab">Time</a>
+						changes</a> 
 				</div>
 				<div class="mdl-tabs__panel is-active" id="comments-panel">
+					<div id="comment-list">
+								
+					</div>
+					<br />
 					<div class="mdl-card mdl-shadow--2dp demo-card-wide">
 						<div class="mdl-card__title">
-							<h2 class="mdl-card__title-text">Comments</h2>
+							<h2 class="mdl-card__title-text">New Comment</h2>
 						</div>
-						<div class="mdl-card__supporting-text"></div>
+						<div class="mdl-card__supporting-text">
+							<form action="#">
+								<div
+									class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-demo">
+									<input class="mdl-textfield__input" type="text"
+										id="form-task-comment-title" /> <label class="mdl-textfield__label"
+										for="form-task-comment-title">Title</label>
+								</div>
+								<div
+									class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-demo">
+									<textarea class="mdl-textfield__input" type="text" rows="10"
+										id="form-task-comment-description"></textarea>
+										<label class="mdl-textfield__label" for="form-task-comment-description">Description</label>
+								</div>
+							</form>
+						</div>
 						<div class="mdl-card__actions mdl-card--border">
 							<a
-								class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-								Submit comment </a>
+								class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+								onclick="submitComment();">
+								Submit </a>
 						</div>
 					</div>
 				</div>
 				<div class="mdl-tabs__panel" id="source-changes-panel">THIS IS
 					SOURCE</div>
-				<div class="mdl-tabs__panel" id="time-panel">THIS IS TIME</div>
 			</div>
 		</div>
+		</div>
+			</section>
+			<section class="mdl-layout__tab-panel" id="task-time-management">
+				<div class="page-content">THE TIME MANAGEMENT</div>
+			</section>
+			<section class="mdl-layout__tab-panel" id="task-bounty">
+				<div class="page-content">THE BOUNTY SYSTEM</div>
+			</section>
 		</main>
 	</div>
 
 	<script src="js/material.min.js"></script>
 	<script src="js/jquery-1.11.2.min.js"></script>
 	<script src="ts/common.js"></script>
-	<script src="ts/model/TaskRepository.js"></script>
-	<script src="ts/model/Task.js"></script>
+	<script src="ts/model/DTOComment.js"></script>
+	<script src="ts/model/DTOVersion.js"></script>
+	<script src="ts/model/DTOTaskRepository.js"></script>
+	<script src="ts/model/DTOTask.js"></script>
+	<script src="ts/model/TaskRepositoryService.js"></script>
 	<script src="ts/model/TaskService.js"></script>
+	<script src="ts/model/CommentService.js"></script>
 	<script src="ts/task.js"></script>
 	<script>
 		$(document).ready(function() {

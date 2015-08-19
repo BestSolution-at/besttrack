@@ -1,5 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-/// <reference path="TaskRepository.ts"/>
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOTaskRepository.ts"/>
 var TaskRepositoryService = (function () {
     function TaskRepositoryService(urlPrefix) {
         this.urlPrefix = urlPrefix;
@@ -17,7 +18,25 @@ var TaskRepositoryService = (function () {
             data: JSON.stringify(entity),
             contentType: "application/json"
         }).done(function (data) {
-            callback(data.value, null);
+            var entity;
+            if (data) {
+                entity = new DTOTaskRepository(data);
+            }
+            callback(entity, null);
+        });
+    };
+    TaskRepositoryService.prototype.update = function (entity, callback) {
+        $.ajax({
+            url: this.urlPrefix + "/taskrepository/" + entity.sid,
+            type: "PUT",
+            data: JSON.stringify(entity),
+            contentType: "application/json"
+        }).done(function (data) {
+            var entity;
+            if (data) {
+                entity = new DTOTaskRepository(data);
+            }
+            callback(entity, null);
         });
     };
     TaskRepositoryService.prototype.listRequest = function (path, callback) {
@@ -28,7 +47,7 @@ var TaskRepositoryService = (function () {
             data: {},
             cache: false
         }).done(function (data) {
-            var entityList = data.map(function (o) { return new TaskRepository(o); });
+            var entityList = data.map(function (o) { return new DTOTaskRepository(o); });
             callback(entityList, null);
         });
     };
@@ -42,7 +61,7 @@ var TaskRepositoryService = (function () {
         }).done(function (data) {
             var entity;
             if (data) {
-                entity = new TaskRepository(data);
+                entity = new DTOTaskRepository(data);
             }
             callback(entity, null);
         });

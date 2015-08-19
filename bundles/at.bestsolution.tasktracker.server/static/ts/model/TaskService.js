@@ -1,5 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-/// <reference path="Task.ts"/>
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOTask.ts"/>
 var TaskService = (function () {
     function TaskService(urlPrefix) {
         this.urlPrefix = urlPrefix;
@@ -17,7 +18,25 @@ var TaskService = (function () {
             data: JSON.stringify(entity),
             contentType: "application/json"
         }).done(function (data) {
-            callback(data.value, null);
+            var entity;
+            if (data) {
+                entity = new DTOTask(data);
+            }
+            callback(entity, null);
+        });
+    };
+    TaskService.prototype.update = function (entity, callback) {
+        $.ajax({
+            url: this.urlPrefix + "/task/" + entity.sid,
+            type: "PUT",
+            data: JSON.stringify(entity),
+            contentType: "application/json"
+        }).done(function (data) {
+            var entity;
+            if (data) {
+                entity = new DTOTask(data);
+            }
+            callback(entity, null);
         });
     };
     TaskService.prototype.listRequest = function (path, callback) {
@@ -28,7 +47,7 @@ var TaskService = (function () {
             data: {},
             cache: false
         }).done(function (data) {
-            var entityList = data.map(function (o) { return new Task(o); });
+            var entityList = data.map(function (o) { return new DTOTask(o); });
             callback(entityList, null);
         });
     };
@@ -42,13 +61,16 @@ var TaskService = (function () {
         }).done(function (data) {
             var entity;
             if (data) {
-                entity = new Task(data);
+                entity = new DTOTask(data);
             }
             callback(entity, null);
         });
     };
-    TaskService.prototype.selectOpenTasksForRepository = function (rId, callback) {
+    TaskService.prototype.openTaskInRepository = function (rId, callback) {
         this.listRequest(this.urlPrefix + "/task/open-tasks-in-repo?rId=" + rId + "", callback);
+    };
+    TaskService.prototype.getCompleteTask = function (sid, callback) {
+        this.valueRequest(this.urlPrefix + "/task/complete-task?sid=" + sid + "", callback);
     };
     return TaskService;
 })();

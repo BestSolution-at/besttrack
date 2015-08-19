@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="TaskAttachment.ts"/>
-
-interface TaskAttachmentValueCallback {
-	( entity : TaskAttachment, err: any ) : void
-}
-
-interface TaskAttachmentListCallback {
-	( entity : TaskAttachment[], err: any ) : void
-}
-
-interface TaskAttachmentCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOTaskAttachment.ts"/>
 
 class TaskAttachmentService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class TaskAttachmentService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : TaskAttachmentListCallback ) {
+	getAll( callback : Consumer<DTOTaskAttachment[]> ) {
 		this.listRequest(this.urlPrefix + "/taskattachment", callback);
 	}
 
-	get( id : number, callback : TaskAttachmentValueCallback ) {
+	get( id : number, callback : Consumer<DTOTaskAttachment> ) {
 		this.valueRequest(this.urlPrefix + "/taskattachment/"+id, callback);
 	}
 
-	create( entity : TaskAttachment, callback : TaskAttachmentCreationCallback ) {
+	create( entity : DTOTaskAttachment, callback : Consumer<DTOTaskAttachment> ) {
 		$.ajax({
     		url: this.urlPrefix + "/taskattachment",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOTaskAttachment;
+			if( data ) {
+				entity = new DTOTaskAttachment(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : TaskAttachmentListCallback ) {
+	update( entity : DTOTaskAttachment, callback : Consumer<DTOTaskAttachment> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/taskattachment/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOTaskAttachment;
+			if( data ) {
+				entity = new DTOTaskAttachment(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOTaskAttachment[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class TaskAttachmentService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : TaskAttachment[] = data.map( function( o ) { return new TaskAttachment(o); } );
+			var entityList : DTOTaskAttachment[] = data.map( function( o ) { return new DTOTaskAttachment(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : TaskAttachmentValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOTaskAttachment> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class TaskAttachmentService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : TaskAttachment;
+			var entity : DTOTaskAttachment;
 			if( data ) {
-				entity = new TaskAttachment(data);
+				entity = new DTOTaskAttachment(data);
 			}
 			callback(entity, null);
 		});

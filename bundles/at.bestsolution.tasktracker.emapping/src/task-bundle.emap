@@ -6,7 +6,7 @@ bundle Tasktracker {
 	},
 	Comment {
 		webservice {
-			Comment.selectAllForTask as "commentsPerTask" {
+			Comment.selectAllForTask as commentsPerTask "comments-per-task" {
 				query-param Comment.selectAllForTask.tid
 			}
 		} rest
@@ -25,8 +25,17 @@ bundle Tasktracker {
 	},
 	Task{
 		webservice {
-			Task.selectOpenTasksForRepository as "open-tasks-in-repo" {
+			Task.selectOpenTasksForRepository as openTaskInRepository "open-tasks-in-repo" {
 				query-param Task.selectOpenTasksForRepository.rId
+			}
+			Task.selectById as getCompleteTask "complete-task" {
+				query-param Task.selectById.sid
+				greedy {
+					Task.repository {
+						TaskRepository.versionList
+					}
+					Task.commentList
+				}
 			}
 		} rest
 	},
@@ -38,5 +47,17 @@ bundle Tasktracker {
 	},
 	Version{
 		webservice rest
+	}
+	generator {
+		DTO {
+			project : "at.bestsolution.tasktracker.dto"
+		}
+		REST {
+			project : "at.bestsolution.tasktracker.rest"
+		}
+		typescript {
+			project : "at.bestsolution.tasktracker.server"
+			folder : "static/ts/model"
+		}
 	}
 } databases "Postgres"

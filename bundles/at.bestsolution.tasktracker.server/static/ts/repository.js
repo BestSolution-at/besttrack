@@ -1,9 +1,9 @@
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="../typings/mdl/mdl.d.ts"/>
 /// <reference path="common.ts"/>
-/// <reference path="model/TaskRepository.ts"/>
+/// <reference path="model/DTOTaskRepository.ts"/>
 /// <reference path="model/TaskRepositoryService.ts"/>
-/// <reference path="model/Task.ts"/>
+/// <reference path="model/DTOTask.ts"/>
 /// <reference path="model/TaskService.ts"/>
 var repository;
 function initRepositoryPage() {
@@ -21,7 +21,7 @@ function handleRepositoryData(data) {
         $(this).html(data.name);
     });
     var taskService = new TaskService(rootPath);
-    taskService.selectOpenTasksForRepository(data.sid, handleRepositoryTasks);
+    taskService.openTaskInRepository(data.sid, handleRepositoryTasks);
 }
 function handleRepositoryTasks(data) {
     console.log("Tasks data: ", data);

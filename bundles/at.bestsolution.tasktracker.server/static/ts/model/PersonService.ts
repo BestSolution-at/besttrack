@@ -1,18 +1,6 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
-
-/// <reference path="Person.ts"/>
-
-interface PersonValueCallback {
-	( entity : Person, err: any ) : void
-}
-
-interface PersonListCallback {
-	( entity : Person[], err: any ) : void
-}
-
-interface PersonCreationCallback {
-	( id : number, err : any ) : void
-}
+/// <reference path="../util/bestUtils.ts"/>
+/// <reference path="DTOPerson.ts"/>
 
 class PersonService {
 	urlPrefix : string
@@ -21,26 +9,45 @@ class PersonService {
 		this.urlPrefix = urlPrefix
 	}
 
-	getAll( callback : PersonListCallback ) {
+	getAll( callback : Consumer<DTOPerson[]> ) {
 		this.listRequest(this.urlPrefix + "/person", callback);
 	}
 
-	get( id : number, callback : PersonValueCallback ) {
+	get( id : number, callback : Consumer<DTOPerson> ) {
 		this.valueRequest(this.urlPrefix + "/person/"+id, callback);
 	}
 
-	create( entity : Person, callback : PersonCreationCallback ) {
+	create( entity : DTOPerson, callback : Consumer<DTOPerson> ) {
 		$.ajax({
     		url: this.urlPrefix + "/person",
     		type: "PUT",
     		data: JSON.stringify(entity),
     		contentType: "application/json"
 		}).done( function(data : any) {
-			callback(data.value, null);
+			var entity : DTOPerson;
+			if( data ) {
+				entity = new DTOPerson(data);
+			}
+			callback(entity, null);
 		} );
 	}
 
-	private listRequest(path : string, callback : PersonListCallback ) {
+	update( entity : DTOPerson, callback : Consumer<DTOPerson> ) {
+		$.ajax({
+    		url: this.urlPrefix + "/person/"+entity.sid,
+    		type: "PUT",
+    		data: JSON.stringify(entity),
+    		contentType: "application/json"
+		}).done( function(data : any) {
+			var entity : DTOPerson;
+			if( data ) {
+				entity = new DTOPerson(data);
+			}
+			callback(entity, null);
+		} );
+	}
+
+	private listRequest(path : string, callback : Consumer<DTOPerson[]> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -48,12 +55,12 @@ class PersonService {
 			data: {},
 			cache : false
 		}).done(function(data : any[]) {
-			var entityList : Person[] = data.map( function( o ) { return new Person(o); } );
+			var entityList : DTOPerson[] = data.map( function( o ) { return new DTOPerson(o); } );
 			callback(entityList, null);
 		});
 	}
 
-	private valueRequest(path : string, callback : PersonValueCallback ) {
+	private valueRequest(path : string, callback : Consumer<DTOPerson> ) {
 		$.ajax({
 			dataType: "json",
 			type: "GET",
@@ -61,9 +68,9 @@ class PersonService {
 			data: {},
 			cache : false
 		}).done(function(data : any) {
-			var entity : Person;
+			var entity : DTOPerson;
 			if( data ) {
-				entity = new Person(data);
+				entity = new DTOPerson(data);
 			}
 			callback(entity, null);
 		});
